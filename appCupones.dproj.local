@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2023/03/18 12:22:06.000.966,=E:\Embarcadero\Proyectos\Unit1.pas</Transaction>
+    <Transaction>2023/03/31 09:49:55.000.239,=E:\Embarcadero\Proyectos\Unit1.pas</Transaction>
+    <Transaction>2023/03/31 10:20:22.000.334,=E:\Embarcadero\Proyectos\Unit2.pas</Transaction>
+    <Transaction>2023/03/31 10:23:03.000.695,E:\Embarcadero\Proyectos\Unit2.dfm=E:\Embarcadero\Proyectos\Pruebas\appCupones\uDM.dfm</Transaction>
+    <Transaction>2023/03/31 10:23:03.000.695,E:\Embarcadero\Proyectos\Unit2.pas=E:\Embarcadero\Proyectos\Pruebas\appCupones\uDM.pas</Transaction>
+    <Transaction>2023/03/31 10:23:21.000.325,E:\Embarcadero\Proyectos\Unit1.dfm=E:\Embarcadero\Proyectos\Pruebas\appCupones\uMain.dfm</Transaction>
+    <Transaction>2023/03/31 10:23:21.000.325,E:\Embarcadero\Proyectos\Unit1.pas=E:\Embarcadero\Proyectos\Pruebas\appCupones\uMain.pas</Transaction>
+    <Transaction>2023/03/31 10:23:26.000.727,E:\Embarcadero\Proyectos\Project1.dproj=E:\Embarcadero\Proyectos\Pruebas\appCupones\appCupones.dproj</Transaction>
+    <Transaction>2023/03/31 11:16:07.000.151,=E:\Embarcadero\Proyectos\012-ComisioneVentasCobranza_Repore\f_Main.pas</Transaction>
+    <Transaction>2023/03/31 16:05:27.000.608,=E:\Embarcadero\Proyectos\001-appCalcularCompras\f_Main.pas</Transaction>
+    <Transaction>2023/03/31 16:19:52.000.170,E:\Embarcadero\Proyectos\001-appCalcularCompras\f_Main.pas=</Transaction>
+    <Transaction>2023/04/02 13:09:23.000.579,=E:\Embarcadero\Components\Almediadev StyleControls VCL 5.06\samples\CustomUIForms_Demos\CustomGPForm2\Unit2.pas</Transaction>
+    <Transaction>2023/04/02 13:49:39.000.650,E:\Embarcadero\Components\Almediadev StyleControls VCL 5.06\samples\CustomUIForms_Demos\CustomGPForm2\Unit2.pas=</Transaction>
+    <Transaction>2023/04/03 16:18:46.000.233,=E:\Embarcadero\Proyectos\Pruebas\appCupones\Unit2.pas</Transaction>
+    <Transaction>2023/04/03 16:24:35.000.773,E:\Embarcadero\Proyectos\Pruebas\appCupones\uConfig.dfm=E:\Embarcadero\Proyectos\Pruebas\appCupones\Unit2.dfm</Transaction>
+    <Transaction>2023/04/03 16:24:35.000.773,E:\Embarcadero\Proyectos\Pruebas\appCupones\uConfig.pas=E:\Embarcadero\Proyectos\Pruebas\appCupones\Unit2.pas</Transaction>
+    <Transaction>2023/04/07 13:55:34.000.265,=E:\Embarcadero\Proyectos\005-appReporteDocumentosAB\f_Acceso.pas</Transaction>
+    <Transaction>2023/04/07 13:56:05.000.479,E:\Embarcadero\Proyectos\Pruebas\appCupones\uAcceso.dfm=E:\Embarcadero\Proyectos\005-appReporteDocumentosAB\f_Acceso.dfm</Transaction>
+    <Transaction>2023/04/07 13:56:05.000.479,E:\Embarcadero\Proyectos\Pruebas\appCupones\uAcceso.pas=E:\Embarcadero\Proyectos\005-appReporteDocumentosAB\f_Acceso.pas</Transaction>
+    <Transaction>2023/04/07 13:57:43.000.695,=E:\Embarcadero\Proyectos\010-Forma 30 Declaracion IVA\f_Acceso.pas</Transaction>
+    <Transaction>2023/04/07 13:58:02.000.413,E:\Embarcadero\Proyectos\010-Forma 30 Declaracion IVA\f_Acceso.pas=</Transaction>
+    <Transaction>2023/04/07 13:59:03.000.755,E:\Embarcadero\Proyectos\Pruebas\appCupones\uAcceso.pas=</Transaction>
+    <Transaction>2023/04/07 14:51:07.000.974,=E:\Embarcadero\Proyectos\Pruebas\appCupones\uAcceso.pas</Transaction>
+    <Transaction>2023/04/07 14:53:26.000.938,=E:\Embarcadero\Proyectos\005-appReporteDocumentosAB\f_Acceso.pas</Transaction>
+    <Transaction>2023/04/07 15:02:35.000.258,E:\Embarcadero\Proyectos\005-appReporteDocumentosAB\f_Acceso.pas=</Transaction>
+    <Transaction>2023/04/07 15:49:54.000.537,=E:\Embarcadero\Proyectos\008-appRomanaPE\f_MenuPpal.pas</Transaction>
+    <Transaction>2023/04/07 15:50:41.000.792,E:\Embarcadero\Proyectos\008-appRomanaPE\f_MenuPpal.pas=</Transaction>
+    <Transaction>2023/04/15 23:59:47.000.498,=E:\Embarcadero\Proyectos\Pruebas\appCupones\Unit1.pas</Transaction>
+    <Transaction>2023/04/16 00:09:32.000.269,E:\Embarcadero\Proyectos\Pruebas\appCupones\Unit1.pas=E:\Embarcadero\Proyectos\Pruebas\appCupones\uReimpresion.pas</Transaction>
+    <Transaction>2023/04/16 00:09:32.000.269,E:\Embarcadero\Proyectos\Pruebas\appCupones\Unit1.dfm=E:\Embarcadero\Proyectos\Pruebas\appCupones\uReimpresion.dfm</Transaction>
+    <Transaction>2023/04/27 14:21:32.000.496,=E:\Embarcadero\Proyectos\Pruebas\appCupones\Unit1.pas</Transaction>
+    <Transaction>2023/04/27 14:27:51.000.453,E:\Embarcadero\Proyectos\Pruebas\appCupones\Unit1.pas=E:\Embarcadero\Proyectos\Pruebas\appCupones\uAutorizaUser.pas</Transaction>
+    <Transaction>2023/04/27 14:27:51.000.453,E:\Embarcadero\Proyectos\Pruebas\appCupones\Unit1.dfm=E:\Embarcadero\Proyectos\Pruebas\appCupones\uAutorizaUser.dfm</Transaction>
+    <Transaction>2024/04/02 12:15:42.000.355,=E:\Embarcadero\Proyectos\001-appCalcularCompras\f_BuscarProveedor.pas</Transaction>
+    <Transaction>2024/04/02 12:16:28.000.902,E:\Embarcadero\Proyectos\001-appCalcularCompras\f_BuscarProveedor.pas=</Transaction>
+    <Transaction>2024/04/02 19:56:03.000.872,=C:\EMBARCADERO\Proyectos\021-appCupones\Unit1.pas</Transaction>
+    <Transaction>2024/04/02 20:06:32.000.688,C:\EMBARCADERO\Proyectos\021-appCupones\uSeleccion.dfm=C:\EMBARCADERO\Proyectos\021-appCupones\Unit1.dfm</Transaction>
+    <Transaction>2024/04/02 20:06:32.000.688,C:\EMBARCADERO\Proyectos\021-appCupones\uSeleccion.pas=C:\EMBARCADERO\Proyectos\021-appCupones\Unit1.pas</Transaction>
+  </Transactions>
+	<ProjectSortOrder AutoSort="0" SortType="0">
+    <File Path="uAcceso.pas"/>
+    <File Path="uAcceso.dfm"/>
+    <File Path="uConfig.pas"/>
+    <File Path="uConfig.dfm"/>
+    <File Path="uDM.pas"/>
+    <File Path="uDM.dfm"/>
+    <File Path="uMain.pas"/>
+    <File Path="uMain.dfm"/>
+    <File Path="uReimpresion.pas"/>
+    <File Path="uReimpresion.dfm"/>
+    <File Path="uAutorizaUser.pas"/>
+    <File Path="uAutorizaUser.dfm"/>
+    <File Path="uSeleccion.pas"/>
+    <File Path="uSeleccion.dfm"/>
+  </ProjectSortOrder>
+</BorlandProject>

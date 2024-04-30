@@ -1,0 +1,35 @@
+unit uDM;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, Data.DB, dbisamtb, frxClass;
+
+type
+  TdmData = class(TDataModule)
+    BD_HAC: TDBISAMDatabase;
+    Query: TDBISAMQuery;
+    rprTicket: TfrxReport;
+    SQL_User: TDBISAMQuery;
+    BD_APP: TDBISAMDatabase;
+    SQL_APP: TDBISAMQuery;
+    Query_Config: TDBISAMQuery;
+    Query_Serie: TDBISAMQuery;
+    Query_UpdateInser: TDBISAMQuery;
+    BD_Conf: TDBISAMDatabase;
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  dmData: TdmData;
+
+implementation
+
+{%CLASSGROUP 'Vcl.Controls.TControl'}
+
+{$R *.dfm}
+
+end.

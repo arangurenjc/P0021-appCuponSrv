@@ -1,0 +1,485 @@
+unit uReimpresion;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  vcl.Printers, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms,
+  Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls, Vcl.ComCtrls, scControls,
+  scAdvancedControls, Data.DB, scGrids, scDBGrids, Vcl.Buttons, scGPExtControls,
+  Vcl.CheckLst, Datasnap.DBClient, scGPControls;
+
+type
+  TfReimprision = class(TForm)
+    scDBGrid1           : TscDBGrid;
+    dsConsultaCupon     : TDataSource;
+    Panel2              : TPanel;
+    CheckListBox1       : TCheckListBox;
+    sbImprimir          : TSpeedButton;
+    Panel1              : TPanel;
+    Label3              : TLabel;
+    Label2              : TLabel;
+    Label4              : TLabel;
+    Label1              : TLabel;
+    Label5              : TLabel;
+    cbSerie             : TComboBox;
+    edCajaID            : TEdit;
+    dtFecha             : TDateTimePicker;
+    edFactura           : TEdit;
+    dtFecha2            : TDateTimePicker;
+    sbBuscar            : TSpeedButton;
+    Label6              : TLabel;
+    edCodCliente        : TEdit;
+    Panel3              : TPanel;
+    scGPChkPreliminar   : TscGPCheckBox;
+    dsTicketExtraviado  : TDataSource;
+    Label7              : TLabel;
+    Panel4              : TPanel;
+    sclbTitulo          : TscLabel;
+    Label8              : TLabel;
+    Label9              : TLabel;
+    Memo1               : TMemo;
+
+    procedure FormShow(Sender: TObject);
+    procedure SpeedButton2Click(Sender: TObject);
+
+    procedure scDBGrid1CellClick(Column: TscColumn);
+    procedure sbImprimirClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure consultarCupon;
+    procedure consultarCuponExtraviado;
+    procedure reimprimirCupon;
+    function cuponExiste(): Boolean;
+
+  end;
+
+var
+  fReimprision: TfReimprision;
+  tipoAcceso: Integer;
+  AutoInc_Operacion: integer;
+
+implementation
+
+uses
+  uDM, uMain;
+
+{$R *.dfm}
+
+procedure TfReimprision.consultarCupon;
+begin
+  with dmData.SQL_Reimprimir do
+  begin
+    Close;
+    Active := False;
+    SQL.Clear;
+
+    SQL.Add('SELECT FCD_FECHA AS FECHA, CAST(FCD_CUPONINI AS VARCHAR(12)) AS DESDE, ');
+    SQL.Add('   CAST(FCD_CUPONFIN AS VARCHAR(12)) AS HASTA, ');
+    SQL.Add('   FCD_CANTCUPON AS [CANT CUPONES], CAST(FCD_FACTURA AS VARCHAR(10)) AS FACTURA, ');
+    SQL.Add('   CAST(FCD_SERIE AS VARCHAR(12)) AS SERIE, CAST(FCM_NOMBRE AS VARCHAR(6)) AS CAJA, ');
+    SQL.Add('   CAST(FCD_CLIENTECOD AS VARCHAR(12)) AS CODCLIENTE, ');
+    SQL.Add('   CAST(FCE_CONCEPTO AS VARCHAR(250)) AS CONCEPTO, ');
+    SQL.Add('   CAST(FCD_CLIENTENOM AS VARCHAR(80)) AS [NOMBRE CLIENTE], ');
+    SQL.Add('   CAST(FCD_CLIENTETLF AS VARCHAR(20)) AS TELEFONO, FCD_HORA AS HORA, ');
+    SQL.Add('   FCD_TOTALBS AS TOTALBS, FCD_TOTALUS AS TOTALUS, FCD_ITEMS AS ITEMS, ');
+    SQL.Add('   FCC_PRINTER AS PRINTER' );
+    { NOMBRE_BD_CONFIG_APP     = 'tConfigApp'; Configurar Rutas App
+      NOMBRE_BD_CONFIG_CAJ     = 'tConfigCaja';   Configura Cajas y Rifas activas e
+      NOMBRE_BD_CUPON_EVENTO   = 'tCuponEvento' ; Base datos Rifas Creadas
+      NOMBRE_BD_CUPON_DETALLE  = 'tCuponDetalle'; Base datos detalle operacion Rifas    }
+
+    SQL.Add('FROM  ' + BD_CUPON_DET);
+    SQL.Add('INNER JOIN ' + BD_CAJAMAESTRO + ' ON FCD_IDCAJA = FCM_IDCAJA');
+    SQL.Add('INNER JOIN ' + BD_CUPON_EVE + ' ON FCD_IDCUPON = FCE_IDCUPON');
+    SQL.Add('INNER JOIN ' + #34 + rutaCaja + BD_CAJACONFIG + #34 + ' ON (FCD_IDCAJA = FCC_IDCAJA) AND (FCD_IDCUPON = FCC_IDCUPON)');
+
+    SQL.Add('WHERE FCM_SERIE = :Serie ');
+
+    if edCajaID.Text <> '' then
+    begin
+      SQL.Add('    AND FCM_NOMBRE = :Caja ');
+      ParamByName('Caja').AsString := edCajaID.Text;
+    end;
+
+    if edFactura.Text <> '' then
+    begin
+      SQL.Add('    AND FCD_FACTURA = :Factura ');
+      ParamByName('Factura').AsString := edFactura.Text;
+    end;
+
+    if (dtFecha.Date <> null) and (dtFecha.Date <> null) then
+    begin
+      SQL.Add('    AND FCD_FECHA BETWEEN :Fecha1 AND :Fecha2 ');
+      ParamByName('Fecha1').AsDate := dtFecha.Date;
+      ParamByName('Fecha2').AsDate := dtFecha2.Date;
+    end
+    else if (dtFecha.Date <> null) then
+    begin
+      SQL.Add('    AND FCD_FECHA = :Fecha1 ');
+      ParamByName('Fecha1').AsDate := dtFecha.Date;
+    end
+    else if (dtFecha2.Date <> null) then
+    begin
+      SQL.Add('    AND FCD_FECHA = :Fecha2 ');
+      ParamByName('Fecha2').AsDate := dtFecha2.Date;
+    end;
+
+    ParamByName('Serie').AsString := cbSerie.Text;
+    Memo1.Clear;
+    Memo1.Lines.Add(SQL.Text);
+    Open;
+
+    if RecordCount > 0 then
+    begin
+      sbImprimir.Enabled := true;
+      scDBGrid1.DataSource := dsConsultaCupon;
+      scDBGrid1.Enabled := true;
+    end;
+
+  end;
+end;
+
+procedure TfReimprision.consultarCuponExtraviado;
+begin
+  cantCupones := 0;
+
+  with uDM.dmData.Query do
+  begin
+    Close;
+    Active := false;
+    SQL.Clear;
+
+    SQL.Add('SELECT FTI_AUTOINCREMENT AS AUTO, ');
+    SQL.Add('    CAST(FTI_SERIE AS VARCHAR(12)) AS SERIE, CAST(FTI_DOCUMENTO AS VARCHAR(10)) AS DOCUMENTO,');
+    SQL.Add('    CAST(FTI_FECHAEMISION AS DATE) AS FECHA,');
+    SQL.Add('    CAST(FTI_RESPONSABLE AS VARCHAR(12)) AS CLIENTECOD,');
+    SQL.Add('    CAST(FTI_PERSONACONTACTO AS VARCHAR(80)) AS CLIENTENOM,');
+    SQL.Add('    CAST(FTI_TELEFONOCONTACTO AS VARCHAR(20)) AS CLIENTETLF,');
+    SQL.Add('    FTI_FACTORREFERENCIA AS TASA,');
+    SQL.Add('    FTI_TOTALNETO AS TOTALBS,');
+    SQL.Add('    CAST((FTI_TOTALNETO / FTI_FACTORREFERENCIA) AS MONEY) AS TOTALUS,');
+    SQL.Add('    FTI_TOTALITEMS AS ITEMS, FTI_MACHINENAME AS MAQUINA,');
+    SQL.Add('    CAST(FTI_HORA AS VARCHAR(8)) AS HORA');
+    SQL.Add('FROM SOPERACIONINV');
+    SQL.Add('WHERE FTI_TIPO = 11 ');
+    SQL.Add('      AND FTI_FECHAEMISION BETWEEN :fecha1 AND :fecha2 ');
+    SQL.Add('      AND FTI_SERIE = :Serie ');
+    SQL.Add('      AND FTI_RESPONSABLE = :CodCliente ');
+    SQL.Add('      AND FTI_DOCUMENTO = :FacturaNum ');
+
+
+    //ShowMessage('Data Query Parametros');
+    ParamByName('fecha1').asdate        := dtFecha.Date;
+    ParamByName('fecha2').asdate        := dtFecha2.Date;
+    ParamByName('Serie').AsString       := cbSerie.Text;
+    ParamByName('CodCliente').AsString  := edCodCliente.Text;
+    ParamByName('FacturaNum').AsString  := edFactura.Text;
+
+    try
+      //ShowMessage('Data Query Antes de abrir');
+      Open;
+
+      // darle valores a las variables declaradas en la seccion (001)
+      if RecordCount > 0 then
+      begin
+        fechaDoc    := FieldByName('FECHA').AsDateTime;
+        hora        := FieldByName('HORA').AsString;
+        clienteCod  := FieldByName('CLIENTECOD').AsString;
+        clienteTlf  := FieldByName('CLIENTETLF').AsString;
+        clienteNom  := FieldByName('CLIENTENOM').AsString;
+        documento   := FieldByName('DOCUMENTO').AsString;
+        totalBS     := FieldByName('TOTALBS').AsFloat;
+        totalUS     := FieldByName('TOTALUS').AsFloat;
+        tasa        := FieldByName('TASA').AsFloat;
+        items       := FieldByName('ITEMS').AsInteger;
+        equipo      := FieldByName('MAQUINA').AsString;
+        serie       := FieldByName('SERIE').AsString;
+        //cantCupones := Trunc(totalUS / VtaMin);
+        AutoInc2    := FieldByName('AUTO').AsInteger;
+
+        sbImprimir.Enabled := true;
+        scDBGrid1.DataSource := dsTicketExtraviado;
+        scDBGrid1.Enabled := true;
+
+      end;
+    finally
+      //Close;
+    end;
+
+  end;
+end;
+
+function TfReimprision.cuponExiste: Boolean;
+begin
+  with uDM.dmData.sql_existecupon do
+  begin
+    Close;
+    Active := false;
+    SQL.Clear;
+
+    SQL.Add('SELECT FCD_AUTOINC_OPERACION FROM ' + BD_CUPON_DET );
+    SQL.Add('WHERE');
+    SQL.Add('    FCD_AUTOINC_OPERACION = :Auto ');
+    SQL.Add('    AND FCD_FACTURA = :Factura ');
+    SQL.Add('    AND FCD_CLIENTECOD = :CodCliente');
+    SQL.Add('    AND FCD_SERIE  = :Serie ');
+
+    ParamByName('Auto').AsInteger       := AutoInc_Operacion;
+    ParamByName('Factura').AsString     := scDBGrid1.Fields[2].AsString;
+    ParamByName('CodCliente').AsString  := scDBGrid1.Fields[4].AsString;
+    ParamByName('Serie').AsString       := scDBGrid1.Fields[1].AsString;
+
+    try
+      Open;
+      if RecordCount > 0 then
+        Result := True
+      else
+        Result := False;
+    finally
+      Close;
+    end;
+
+  end;
+end;
+
+procedure TfReimprision.FormCreate(Sender: TObject);
+begin
+  dtFecha.Date        := Now();
+  dtFecha2.Date       := Now();
+  sbImprimir.Enabled  := False;
+  Self.Width          := 850;
+  Self.Height         := 600;
+
+  if tipoAcceso = 1 then
+  begin
+    sclbTitulo.Caption  := 'Reimpresión de Cupones';
+    label8.Visible      := false;
+    label9.Visible      := false;
+
+  end;
+
+  if tipoAcceso = 2 then
+  begin
+    sclbTitulo.Caption          := 'Insertar Cupones "Extraviados"';
+    sclbTitulo.GlowEffect.Color := clRed;
+    scGPChkPreliminar.Visible   := False;
+
+  end;
+
+end;
+
+procedure TfReimprision.FormDestroy(Sender: TObject);
+begin
+  AutoInc2      := 0;
+  dmData.SQL_Reimprimir.Close;
+end;
+
+procedure TfReimprision.FormShow(Sender: TObject);
+begin
+  if FileExists(ExtractFilePath(ParamStr(0)) + '\' + BD_DIRAPP + '.DAT') then
+  begin
+    with dmData.Query_Serie do
+    begin
+      Close;
+      Active := False;
+      SQL.Clear;
+
+      SQL.Add('SELECT CAST(DUMMYKEY AS VARCHAR(12)) AS NUM_SERIE FROM SSISTEMA WHERE DUMMYKEY IS NOT NULL');
+
+      try
+        Open;
+
+        cbSerie.Clear;
+        if RecordCount > 0 then
+        begin
+          First;
+          while not dmData.Query_Serie.Eof do
+          begin
+            cbSerie.Items.Add(FieldByName('NUM_SERIE').AsString);
+            Next;
+          end;
+        end;
+      finally
+        Close;
+      end;
+
+    end
+  end;
+end;
+
+
+procedure TfReimprision.reimprimirCupon;
+var
+  I: integer;
+  printIndex: Integer;
+
+begin
+
+  for I := 0 to CheckListBox1.Count - 1 do
+  begin
+    //ShowMessage('Imprimir' + IntToStr( CheckListBox1.Count))  ;
+    if CheckListBox1.Checked[I] = True then
+    begin
+      with uDM.dmData.rprTicket do
+      begin
+
+        Variables.Variables['NoCupon']      := QuotedStr(CheckListBox1.Items[I]);
+        Variables.Variables['fecha']        := QuotedStr(scDBGrid1.Fields[0].AsString);
+        Variables.Variables['hora']         := QuotedStr(scDBGrid1.Fields[11].AsString);
+        Variables.Variables['ClienteCOD']   := QuotedStr(scDBGrid1.Fields[7].AsString);
+        Variables.Variables['ClienteTLF']   := QuotedStr(scDBGrid1.Fields[10].AsString);
+        Variables.Variables['cliente']      := QuotedStr(scDBGrid1.Fields[9].AsString);
+        Variables.Variables['factura']      := QuotedStr(scDBGrid1.Fields[4].AsString);
+        Variables.Variables['totalBS']      := QuotedStr(FormatFloat('#,##0.00', scDBGrid1.Fields[12].AsFloat));
+        Variables.Variables['totalUS']      := QuotedStr(FormatFloat('#,##0.00', scDBGrid1.Fields[13].AsFloat));
+        Variables.Variables['factor']       := QuotedStr(FormatFloat('#,##0.00', 0));
+        Variables.Variables['cantItems']    := scDBGrid1.Fields[14].AsInteger;
+        Variables.Variables['caja']         := QuotedStr(scDBGrid1.Fields[6].AsString);
+
+        Variables.Variables['CantCuponDe']  := QuotedStr(Format('%.2D', [I + 1]) + '/' + Format('%.2D', [(CheckListBox1.Count)]));
+        Variables.Variables['DetalleCupon'] := scDBGrid1.Fields[8].AsString; //Concepto;
+
+        if politicas[3] = '1' then
+        begin
+
+          if scGPChkPreliminar.Checked then
+          begin
+            PrepareReport();
+            ShowReport();
+
+          end
+          else
+          begin
+
+            Prn                     := TPrinter.Create;
+            printIndex              := Prn.Printers.IndexOf(scDBGrid1.Fields[15].AsString); //namePrint);
+            Prn.PrinterIndex        := printIndex;
+            PrintOptions.Printer    := Prn.Printers[printIndex];
+            PrintOptions.ShowDialog := False;
+            PrepareReport;
+            Print;
+            Prn.Free;
+          end;
+
+        end
+        else
+        begin
+        //ShowMessage('esta es la impresora activa : ' + namePrint);
+        //if yaImprimio then
+        //begin
+          ShowMessage('No está permitido la reimpresión');
+        end;
+      end;
+    end;
+
+  end;
+
+
+end;
+
+procedure TfReimprision.scDBGrid1CellClick(Column: TscColumn);
+var
+  i, pos, cant: Integer;
+  caja, cuponIni: string;
+begin
+
+  if tipoAcceso = 1 then
+  begin
+    cuponIni := scDBGrid1.Fields[1].AsString;
+    cant := scDBGrid1.Fields[3].AsInteger;
+    pos := StrToInt(Copy(cuponIni, 5, 6));
+
+    CheckListBox1.Clear;
+    for i := 0 to cant - 1 do
+    begin
+
+      CheckListBox1.Items.Add(cuponIni);
+
+      pos := pos + 1;
+      cuponIni := Copy(cuponIni, 1, 4) + Format('%.6d', [pos]);
+
+    end
+  end;
+
+  if tipoAcceso = 2 then
+    AutoInc_Operacion := scDBGrid1.Fields[0].AsInteger;
+
+end;
+
+procedure TfReimprision.sbImprimirClick(Sender: TObject);
+const
+  MENSAJE_APP = 'Esta opción genera los cupones "extraviados" ' + #10#13 +
+                'el cual la APP no pudo insertar' + #10#13 +
+                'Confirme la Selección ' + #10#13 +
+                'Presione "OK" para continuar ';
+
+  MENSAJE_NOCUPON = 'Este Registro no Cumple' + #10#13 +
+                    'Con las condiciones para' + #10#13 +
+                    'Obtener Cupones' + #10#13 +
+                    'Presione "OK" para continuar ';
+var
+  respuesta : Integer;
+begin
+  if tipoAcceso = 1 then
+    reimprimirCupon;
+
+  if tipoAcceso = 2 then
+  begin
+    if MessageDlg(MENSAJE_APP, mtConfirmation, [mbOK, mbCancel], 0, mbCancel) = mrOk then
+    begin
+      if cuponExiste then
+      begin
+        ShowMessage('El registro ya existe');
+        exit
+      end;
+
+      fMain.getConfigVar;
+      with dmData.SQL_CajaConfig do
+      begin
+        First;
+        while not Eof do
+        begin
+          fMain.getConfigVarCaja;
+
+          if FieldByName('STATUS').ASBOOLEAN  then
+          begin
+            fMain.verificarCuppones(AutoInc2, 2); //Es revision directa y no por insercion manual
+            fMain.imprimirTicket(2);
+            if cantCupones > 0 then
+            begin
+              fMain.insert_BDClienteCupon(2);
+              fMain.update_BDCuponConfig;
+            end
+            else
+              respuesta := MessageDlg(MENSAJE_NOCUPON,mtConfirmation,[mbOK],0);
+
+          end;
+
+          Next;
+        end;
+
+      end;
+
+    end;
+
+  end;
+
+end;
+
+procedure TfReimprision.SpeedButton2Click(Sender: TObject);
+begin
+  if tipoAcceso = 1 then
+    consultarCupon;
+
+  if tipoAcceso = 2 then
+    consultarCuponExtraviado;
+end;
+
+end.
+

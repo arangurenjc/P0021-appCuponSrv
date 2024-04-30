@@ -1,0 +1,373 @@
+﻿unit uAutorizaUser;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
+  System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.ExtCtrls, scControls, scGPControls, Vcl.StdCtrls, Vcl.Grids, Vcl.ComCtrls,
+  Vcl.Menus, System.ImageList, Vcl.ImgList, Vcl.Buttons;
+
+type
+  TfAutorizaUser = class(TForm)
+    Panel1: TPanel;
+    panelCabecera: TPanel;
+    scLabel1: TscLabel;
+    panelConfig: TPanel;
+    scGBClose: TscGPGlyphButton;
+    ListView1: TListView;
+    StringGrid1: TStringGrid;
+    Panel2: TPanel;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    PopupMenu1: TPopupMenu;
+    M1: TMenuItem;
+    Q1: TMenuItem;
+    ImageList1: TImageList;
+    SpeedButton1: TSpeedButton;
+    Label4: TLabel;
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure scGBCloseClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+    procedure StringGrid1DblClick(Sender: TObject);
+    procedure StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+    procedure M1Click(Sender: TObject);
+    procedure Q1Click(Sender: TObject);
+    procedure StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+    procedure SpeedButton1Click(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure llenarListaUser;
+    procedure updateUser;
+
+  end;
+
+var
+  fAutorizaUser: TfAutorizaUser;
+  colGrid, rowGrid: integer;
+
+const
+  PERMISO_ON = '☻';
+  PERMISO_OFF = '';
+
+implementation
+
+uses
+  uConfig, uDM;
+
+{$R *.dfm}
+
+procedure TfAutorizaUser.FormCreate(Sender: TObject);
+var
+  r: TRect;
+begin
+  if SystemParametersInfo(SPI_GETWORKAREA, 0, @r, 0) then
+  begin
+    {self.Left := r.Right - 10 - fMain.Width + ((fMain.Width - self.Width) div 2);
+    self.Top := r.Bottom + 10 - fMain.Height + ((fMain.Height - self.Height) div 2);}
+
+    self.Left := r.Right - 10 - self.Width;
+    self.Top := r.Bottom - 10 - self.Height;
+    uConfig.fConfig.Left := r.Right - 10 - self.Width - uConfig.fConfig.Width;
+
+    //llenarListaUser;
+  end;
+
+  llenarListaUser;
+
+end;
+
+procedure TfAutorizaUser.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if Key = VK_ESCAPE then
+    close;
+end;
+
+procedure TfAutorizaUser.llenarListaUser;
+var
+  i, j: integer;
+  permisos: string;
+begin
+  with uDM.dmData.SQL_User do
+  begin
+    close;
+    Active := False;
+    SQL.Clear;
+
+    SQL.Add('SELECT NOMBRE AS USER, DESCRIPCION, GRUPO FROM SUSUARIOS');
+    Open;
+
+    i := 1;
+
+    if RecordCount > 0 then
+    begin
+      with StringGrid1 do
+      begin
+        ColCount := 6;
+        RowCount := RecordCount;
+        FixedCols := 2;
+        FixedRows := 1;
+
+        cells[0, 0] := 'Codigo';
+        cells[1, 0] := 'Nombre';
+        cells[2, 0] := '1';
+        cells[3, 0] := '2';
+        cells[4, 0] := '3';
+        cells[5, 0] := '4';
+
+        ColWidths[0] := 80;
+        ColWidths[1] := 150;
+        ColWidths[2] := 25;
+        ColWidths[3] := 25;
+        ColWidths[4] := 25;
+        ColWidths[5] := 25;
+
+      end;
+
+      First;
+      //ListView1.Clear;
+
+      while not dmData.SQL_User.Eof do
+      begin
+        //with ListView1.Items.Add do
+        //begin
+        //  Caption := FieldByName('USER').AsString;
+        //  SubItems.Add(FieldByName('DESCRIPCION').AsString);
+        StringGrid1.Cells[0, i] := FieldByName('USER').AsString;
+        StringGrid1.Cells[1, i] := FieldByName('DESCRIPCION').AsString;
+        permisos := FieldByName('GRUPO').AsString;
+
+        if permisos <> '' then
+        begin
+          permisos := Copy(permisos, 1, 5);
+          for j := 2 to 5 do
+          begin
+            if permisos[j] = '1' then
+              StringGrid1.Cells[j, i] := PERMISO_ON
+            else
+              StringGrid1.Cells[j, i] := PERMISO_OFF;
+          end;
+
+        end;
+
+        Inc(i);
+        Next;
+
+      end;
+
+    end;
+  end;
+end;
+
+procedure TfAutorizaUser.M1Click(Sender: TObject);
+begin
+  //ShowMessage(IntToStr(colgrid) + ',' + IntToStr(rowGrid));
+  StringGrid1.cells[colGrid, rowgrid] := PERMISO_ON;
+  StringGrid1.cells[colGrid + 1, rowgrid] := PERMISO_ON;
+  StringGrid1.cells[colGrid + 2, rowgrid] := PERMISO_ON;
+  StringGrid1.cells[colGrid + 3, rowgrid] := PERMISO_ON;
+
+end;
+
+procedure TfAutorizaUser.Q1Click(Sender: TObject);
+begin
+  StringGrid1.cells[colGrid, rowgrid] := PERMISO_OFF;
+  StringGrid1.cells[colGrid + 1, rowgrid] := PERMISO_OFF;
+  StringGrid1.cells[colGrid + 2, rowgrid] := PERMISO_OFF;
+  StringGrid1.cells[colGrid + 3, rowgrid] := PERMISO_OFF;
+end;
+
+procedure TfAutorizaUser.scGBCloseClick(Sender: TObject);
+begin
+  Close;
+end;
+
+procedure TfAutorizaUser.SpeedButton1Click(Sender: TObject);
+begin
+  updateUser;
+end;
+
+procedure TfAutorizaUser.StringGrid1DblClick(Sender: TObject);
+begin
+  //ShowMessage(StringGrid1.Cells[colGrid, rowGrid] + 'Col : ' + IntToStr(colGrid) + 'Row : ' + IntToStr(rowGrid));
+
+  if StringGrid1.Cells[colGrid, rowGrid] = PERMISO_OFF then
+    StringGrid1.Cells[colGrid, rowGrid] := PERMISO_ON
+  else
+    StringGrid1.Cells[colGrid, rowGrid] := PERMISO_OFF;
+
+  case colGrid of
+    3:
+      begin
+        if StringGrid1.Cells[(colGrid - 1), rowGrid] = PERMISO_OFF then
+          StringGrid1.Cells[colGrid - 1, rowGrid] := PERMISO_ON
+      end;
+
+    4:
+      begin
+        if StringGrid1.Cells[(colGrid - 2), rowGrid] = PERMISO_OFF then
+          StringGrid1.Cells[colGrid - 2, rowGrid] := PERMISO_ON
+      end;
+
+    5:
+      begin
+        if StringGrid1.Cells[(colGrid - 3), rowGrid] = PERMISO_OFF then
+          StringGrid1.Cells[colGrid - 3, rowGrid] := PERMISO_ON
+      end;
+
+  end;
+
+end;
+
+procedure TfAutorizaUser.StringGrid1DrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect; State: TGridDrawState);
+var
+  sTexto: string;           // Texto que va a imprimir en la celda actual
+  Alineacion: TAlignment;   // Alineación que le vamos a dar al texto
+  iAnchoTexto: Integer;     // Ancho del texto a imprimir en pixels
+begin
+  with StringGrid1.Canvas do
+  begin
+    // Lo primero es coger la fuente por defecto que le hemos asignado al componente
+    Font.Name := StringGrid1.Font.Name;
+    Font.Size := StringGrid1.Font.Size;
+
+    if ARow = 0 then
+      Alineacion := taCenter
+    else
+      // Si es la columna del importe pendiente alineamos el texto a la derecha
+      if ACol in [2, 3, 4] then
+      Alineacion := taCenter
+    else
+      Alineacion := taLeftJustify;
+
+    // ¿Es una celda fija de sólo lectura?
+    if gdFixed in State then
+    begin
+      Brush.Color := clNavy;      // le ponemos azul de fondo
+      Font.Color := clWhite;      // fuente blanca
+      Font.Style := [fsBold];     // y negrita
+    end
+    else
+    begin
+      // ¿Esta enfocada la celda?
+      if gdFocused in State then
+      begin
+        Brush.Color := clRed;     // fondo rojo
+        Font.Color := clWhite;    // fuente blanca
+        Font.Style := [fsBold];   // y negrita
+      end
+      else
+      begin
+        // Para el resto de celdas el fondo lo ponemos blanco
+        Brush.Color := clWindow;
+
+        // ¿Es la columna del importe pendiente?
+        if ACol = 2 then
+        begin
+          Font.Color := clGreen;   // la pintamos de azul
+          Font.Style := [fsBold];  // y negrita
+          Alineacion := taCenter;
+        end
+        else
+        begin
+          Font.Color := clBlack;
+          Font.Style := [];
+        end;
+      end;
+    end;
+
+    sTexto := StringGrid1.Cells[ACol, ARow];
+    FillRect(Rect);
+    iAnchoTexto := TextWidth(sTexto);
+
+    case Alineacion of
+      taLeftJustify:
+        TextOut(Rect.Left + 5, Rect.Top + 2, sTexto);
+      taCenter:
+        TextOut(Rect.Left + ((Rect.Right - Rect.Left) - iAnchoTexto) div 2, Rect.Top + 2, sTexto);
+      taRightJustify:
+        TextOut(Rect.Right - iAnchoTexto - 2, Rect.Top + 2, sTexto);
+    end;
+  end;
+
+end;
+
+procedure TfAutorizaUser.StringGrid1MouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+var
+  Col, Row: Integer;
+begin
+  if Shift = [ssRight] then //Esto para el Click derecho
+  begin
+    StringGrid1.MouseToCell(X, Y, Col, Row);
+    if (Row <> 0) and (Col = 2) then
+    begin
+      colGrid := Col;
+      rowGrid := Row;
+      StringGrid1.Row := Row;
+      StringGrid1.Col := Col;
+      PopupMenu1.Popup(Mouse.CursorPos.x, mouse.CursorPos.Y);
+    end;
+
+  end;
+
+end;
+
+procedure TfAutorizaUser.StringGrid1SelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
+begin
+
+  colGrid := ACol;
+  rowGrid := ARow;
+end;
+
+procedure TfAutorizaUser.updateUser;
+var
+  i,j cantReg: integer;
+  arrayPermiso: string;
+begin
+  with uDM.dmData.SQL_UserUpdate do
+  begin
+    close;
+    Active := False;
+
+    uDM.dmData.BD_HAC.StartTransaction();
+
+    SQL.Clear;
+    SQL.Add('UPDATE SUSUARIOS SET GRUPO = :PermisosActivos ');
+    SQL.add('    WHERE NOMBRE = :User ');
+    Prepare;
+
+    cantReg := StringGrid1.RowCount;
+    ShowMessage('Cantidad de registros : ' + IntToStr(cantReg));
+
+    for i := 1 to cantReg do
+    begin
+      arrayPermiso := '1';
+      for j := 2 to 5 do
+      begin
+        if StringGrid1.Cells[j, rowGrid] = '' then
+          arrayPermiso := arrayPermiso + '0'
+          else
+          arrayPermiso := arrayPermiso + '1'
+      end;
+
+      ParamByName('PermisosActivos').AsString := arrayPermiso;
+      ParamByName('User').AsString := StringGrid1.cells[0, i];
+      ExecSQL;
+    end;
+
+    try
+      uDM.dmData.BD_HAC.commit;
+    except
+      ShowMessage('error en actualizacion');
+      uDM.dmData.BD_HAC.Rollback;
+    end;
+
+  end;
+end;
+
+end.
+

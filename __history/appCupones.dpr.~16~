@@ -1,0 +1,21 @@
+program appCupones;
+
+uses
+  Vcl.Forms,
+  uMain in 'uMain.pas' {fMain},
+  uDM in 'uDM.pas' {dmData: TDataModule},
+  uConfig in 'uConfig.pas' {fConfig},
+  Vcl.Themes,
+  Vcl.Styles,
+  uAcceso in 'uAcceso.pas' {fAcceso};
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  TStyleManager.TrySetStyle('Charcoal Dark Slate');
+  Application.CreateForm(TdmData, dmData);
+  Application.CreateForm(TfMain, fMain);
+  Application.Run;
+end.
